@@ -1,0 +1,54 @@
+{% extends "admin_theme/dashboard.html" %}
+{% load staticfiles %}
+{% block styling %}
+    {{ block.super }}
+    <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Open+Sans:600'>
+{% endblock %}
+{% block content %}
+    {% if request.user.is_authenticated %}
+        <script>
+            window.location = "{% url 'user_dashboard' %}";
+        </script>
+    {% endif %}
+    {% load widget_tweaks %}
+    <div class="top-content" style="margin-top: 100px; margin-bottom: 50px;">
+        <div class="inner-bg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3 form-box">
+                        <div class="form-top">
+                            <div class="form-top-left">
+                                <h2 class='text-info center'>Login<span class='small'></span></h2>
+                                <h4>Enter your <strong class='text-justify'> username </strong> and <strong
+                                        class='text-justify'> password </strong> to log on:</h4>
+                            </div>
+                            <div class="form-top-right">
+                                <i class="fa fa-lock"></i>
+                            </div>
+                        </div>
+                        <div class="form-bottom">
+                            <form role="form" action="{% url 'login' %}" method="post" class="login-form">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    {{ form.username |attr:"placeholder:Username..."|add_class:"form-username form-control" }}
+                                </div>
+                                <div class="form-group">
+
+                                    {{ form.password |attr:"placeholder:Password..."|add_class:"form-password form-control" }}
+                                </div>
+                                <hr>
+                                <div class="form-group">
+                                    <label class="sr-only" for="form-submit"></label>
+                                    <center><input type="submit" value='SignIn'
+                                                   class='btn btn-lg btn-info'
+                                                   id='form-submit'></center>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
