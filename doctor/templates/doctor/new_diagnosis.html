@@ -1,12 +1,311 @@
 {% extends 'admin_theme/dashboard.html' %}
 {% load crispy_forms_tags %}
+{% load staticfiles %}
 {% block content %}
-    <div class="panel panel-info">
-        <div class="container-fluid">
-            <div class="panel-heading"><h3>New Admission</h3></div>
-            <div class="panel-body">
+    <style>
+        .ajaxProgress {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255, 255, 255, .8) url({% static 'loading/ajax-loader.gif' %}) 50% 50% no-repeat;
+        }
+
+        body.loading {
+            overflow: hidden;
+        }
+
+        body.loading .modal {
+            display: block;
+        }
+    </style>
+    <div class="body">
+        <div class="panel panel-info">
+            <div class="container-fluid">
+                <div class="panel-heading">
+
+                    <h3>
+                        <center>New Diagnosis</center>
+                    </h3>
+
+                </div>
+                <br>
                 {% crispy form %}
+                <div class="row" id="div_quantity">
+                    <div class="col-md-12">
+                        <span style="text-align: right">
+                            <form method="get">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                              <div class="input-group-addon ">
+                                  Before Breakfast
+
+                              </div>
+                                    </div>
+                                </div>
+                               <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  After Breakfast
+                              </div>
+                            </div>
+                                </div>
+
+
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  Before Lunch
+
+                              </div>
+                            </div>
+                                </div>
+                                 <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  After Lunch
+
+                              </div>
+                            </div>
+                                </div>
+                             <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  Before Dinner
+
+                              </div>
+                               </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  After Dinner
+
+                              </div>
+                            </div>
+                                </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="input-group ">
+                                <input type="number" name="before_breakfast"
+                                       id="id_bb" class="form-control"
+                                       value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+
+                                <input type="number" name="after_breakfast" class="form-control"
+                                       id="id_ab" value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+
+                                <input type="number" name="before_lunch" id="id_bl" class="form-control"
+                                       value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <input type="number" name="after_lunch" id="id_al" class="form-control"
+                                       value="0">
+                                <br>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+
+                                <input type="number" name="before_dinner"
+                                       id="id_bd" class="form-control"
+                                       value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <input type="number" name="after_dinner" id="id_ad" class="form-control"
+                                       value="0">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    </form>
+                    </span>
+                    </div>
+                    <div class="ajaxProgress">
+
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+                <input type="button" name="btn_qty" class="btn btn-primary " id="button_submit"
+                       onclick="products($('#id_composition').val())"
+                       value="Add Composition!!">
+
+                <div class="panel-heading">
+                    <h3>
+                        <center>Prescription &nbsp;<i class="fa fa fa-user-md"></i></center>
+                    </h3>
+                    <div class="box-body">
+                        <table class="table table-striped table-bordered" id="my_data_table">
+                            <thead id="t_head">
+
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <h3>
+                        <button name="checkout" class="btn btn-primary" id="id_checkout">Confirm Prescription</button>
+                    </h3>
+                </div>
+                <br>
+
             </div>
         </div>
+
+
     </div>
+{% endblock %}
+{% block jscript %}
+    <script>
+        var table_data = [];
+        var js;
+        window.onload = function hide() {
+            var all_products = $.getJSON("{% url 'composition_list' %}",
+                function (data) {
+                    js = data;
+                });
+            document.getElementById('div_quantity').style.display = "none";
+        };
+
+        function products(product_id) {
+            product_values = js.filter(function (v) {
+                return v["id"] == product_id;
+            });
+            table_data.push({
+                "composition": product_values[0]['name'],
+                "id": product_values[0]['id'],
+                "slots": [
+                    parseInt($('#id_bb').val()),
+                    parseInt($('#id_ab').val()),
+                    parseInt($('#id_bl').val()),
+                    parseInt($('#id_al').val()),
+                    parseInt($('#id_bd').val()),
+                    parseInt($('#id_ad').val())
+                ],
+                "total": parseInt($('#id_bb').val()) + parseInt($('#id_ab').val()) + parseInt($('#id_bl').val()) + parseInt($('#id_al').val()) + parseInt($('#id_bd').val()) + parseInt($('#id_ad').val()),
+            });
+            callback();
+        }
+
+        $body = $("body");
+
+        function show() {
+            document.getElementById('div_quantity').style.display = "block";
+        }
+
+        function callback() {
+            htmlCode = "<tr><th>Sl.no</th><th>Composition</th><th>Before Breakfast</th><th>After Breakfast</th>" +
+                "<th>Before Lunch</th><th>After Lunch</th><th>Before Dinner</th><th>After Dinner</th><th>Total</th></tr>";
+            document.getElementById("t_head").innerHTML = htmlCode;
+            table_display();
+        }
+
+        function table_display() {
+
+            var table = document.getElementById('my_data_table');
+            var length = table_data.length;
+
+            sum = parseFloat(0);
+            for (i = 0; i < length; i++) {
+                var row_length = table.rows.length;
+                data = table_data[i];
+                row = table.insertRow(row_length);
+                var sl_no = row.insertCell(0);
+                var composition = row.insertCell(1);
+                var bb = row.insertCell(2);
+                var ab = row.insertCell(3);
+                var bl = row.insertCell(4);
+                var al = row.insertCell(5);
+                var bd = row.insertCell(6);
+                var ad = row.insertCell(7);
+                var total = row.insertCell(8);
+                var button = row.insertCell(9);
+                sl_no.innerHTML = i + 1;
+                composition.innerHTML = data.composition;
+                bb.innerHTML = data.slots[0];
+                ab.innerHTML = data.slots[1];
+                bl.innerHTML = data.slots[2];
+                al.innerHTML = data.slots[3];
+                bd.innerHTML = data.slots[4];
+                ad.innerHTML = data.slots[5];
+                total.innerHTML = data.total;
+                sum += parseFloat(total.innerHTML);
+                button.innerHTML = "<input type=button value='Remove' class='btn btn-danger'>";
+                button.onclick = function () {
+                    var value = $(this).closest('tr').children('td:first').text();
+                    if (value > -1) {
+                        table_data.splice(value - 1, 1)
+                        $(this).closest('tr').remove();
+                        callback();
+                    }
+                    else {
+                        alert('Invalid!!! Please refresh the page and retry!')
+                    }
+                }
+            }
+        }
+
+        $('#id_checkout').click(function () {
+            var data = {
+                items: JSON.stringify((table_data)),
+                patient_id:{{ patient_id }},
+                doctor_id:{{ request.user.id }},
+                description: document.getElementById("id_description").innerText,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            };
+            if (confirm('Are you sure?')) {
+                $body.addClass('loading');
+                $('.ajaxProgress').show();
+                $.post("{% url 'complete_prescription' %}", data,
+                    function (json) {
+
+
+                        if (json.status == "success") {
+                            $body.removeClass("loading");
+                            $('.ajaxProgress').hide();
+                            alert("Successfully stored prescription");
+                            window.location = "{% url 'check_patient' %}";
+                        }
+                        else {
+                            $body.removeClass("loading");
+                            $('.ajaxProgress').hide();
+                            alert(json.message);
+                            table_data = json.table_data;
+                            callback();
+                        }
+                    });
+            }
+        });
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+    </script>
 {% endblock %}

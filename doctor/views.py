@@ -6,6 +6,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from doctor.forms import DiagnosisForm
+from users.models import User
 
 
 def dashboard(request):
@@ -14,10 +15,19 @@ def dashboard(request):
     return render(request, 'doctor/doctor_panel.html', {'patients_count': patients_count})
 
 
-def new_diagnosis(request):
-    form = DiagnosisForm()
+def check_patient(request):
+    user = None
     if request.method == 'POST':
-        form = DiagnosisForm(request.POST)
-        if form.is_valid():
-            messages.success(request, "Stored Success")
-    return render(request, 'doctor/new_diagnosis.html',{'form':form})
+        data = request.POST.get("aadhar_number")
+        try:
+            user = User.objects.get(aadhar_number=data)
+        except User.DoesNotExist, e:
+            messages.add_message(request, messages.WARNING, "User with that Aadhar Number does not exist")
+        except ValueError, e:
+            messages.add_message(request, messages.WARNING, "User with that Aadhar Number does not exist")
+    return render(request, 'doctor/check_patient.html', {'user': user})
+
+
+def new_diagnosis(request, patient_id):
+    form = DiagnosisForm()
+    return render(request, 'doctor/new_diagnosis.html', {'form': form, 'patient_id': patient_id})

@@ -1,0 +1,39 @@
+{% extends 'admin_theme/dashboard.html' %}
+{% block content %}
+    <div class="panel">
+        <div class="panel-heading">
+            <center><h3>Check Patient</h3></center>
+        </div>
+        <div class="panel-body">
+            {% if user %}
+                <div class="row">
+                    <div class="col-md-3 col-md-offset-5">
+                        <img src="/media/{{ user.profile_pic }}" class="img-circle" width="200" height="200">
+                    </div>
+                    <div class="col-md-4 col-md-offset-5">
+                        <h4>First Name: <b>{{ user.first_name }}</b><br>
+                            Last Name: <b>{{ user.last_name }}</b><br>
+                            Aadhar Number: <b>{{ user.first_name }}</b><br>
+                            Email: <b>{{ user.email }}</b><br>
+                        </h4>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 pull-right">
+                        <a href="{% url 'new_diagnosis' user.id %}" class="btn btn-info">Proceed to Diagnosis</a>
+                    </div>
+                </div>
+            {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="aadhar_number"><h4>Aadhar number</h4></label><input class="form-control" type="text"
+                                                                                    id="aadhar_number"
+                                                                                    name="aadhar_number">
+                    <input type="submit" value="Check" name="submit" class="btn btn-primary">
+
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

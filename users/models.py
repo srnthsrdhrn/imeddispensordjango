@@ -21,15 +21,14 @@ class User(AbstractUser):
     profile_pic = models.ImageField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
-    objects = CustomManager()
+    deleted_at = models.DateTimeField(null=True,blank=True)
 
 
 class ConsumptionLog(models.Model):
     patient = models.ForeignKey(User, limit_choices_to={'account_type': User.PATIENT})
-    schedule = models.ForeignKey('dispenser.Schedule', related_name='consumptions')
+    schedule = models.ForeignKey('doctor.Schedule', related_name='consumptions')
     consumed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True,blank=True)
     objects = CustomManager()

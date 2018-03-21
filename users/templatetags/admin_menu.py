@@ -15,7 +15,7 @@ def show_admin_menu(user):
                 [
                     {
                         "name": "New Diagnosis",
-                        "url": reverse("new_diagnosis"),
+                        "url": reverse("check_patient"),
                         # "permission": 'kctusers.add_user'
                     },
 

@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'crispy_forms',
     'dal_select2',
-    'dal'
+    'dal',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,5 @@ LOGIN_REDIRECT = 'user_dashboard'
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'landing_page'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
