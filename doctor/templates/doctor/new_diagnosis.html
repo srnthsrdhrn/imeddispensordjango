@@ -146,6 +146,117 @@
                     <div class="ajaxProgress">
 
                     </div>
+                    <div class="col-md-12">
+                        <span style="text-align: right">
+                            <form method="get">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                              <div class="input-group-addon ">
+                                  No. of days
+
+                              </div>
+                                    </div>
+                                </div>
+                               <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  No. of days
+                              </div>
+                            </div>
+                                </div>
+
+
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  No. of days
+
+                              </div>
+                            </div>
+                                </div>
+                                 <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  No. of days
+
+                              </div>
+                            </div>
+                                </div>
+                             <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  No. of days
+
+                              </div>
+                               </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                              <div class="input-group-addon ">
+                                  No. of days
+
+                              </div>
+                            </div>
+                                </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="input-group ">
+                                <input type="number" name="before_breakfast_nod"
+                                       id="id_bb_nod" class="form-control"
+                                       value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+
+                                <input type="number" name="after_breakfast_nod" class="form-control"
+                                       id="id_ab_nod" value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+
+                                <input type="number" name="before_lunch_nod" id="id_bl_nod" class="form-control"
+                                       value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <input type="number" name="after_lunch_nod" id="id_al_nod" class="form-control"
+                                       value="0">
+                                <br>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+
+                                <input type="number" name="before_dinner_nod"
+                                       id="id_bd_nod" class="form-control"
+                                       value="0">
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <input type="number" name="after_dinner_nod" id="id_ad_nod" class="form-control"
+                                       value="0">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    </form>
+                    </span>
+                    </div>
+                    <div class="ajaxProgress">
+
+                    </div>
                 </div>
                 <br>
                 <br>
@@ -207,7 +318,21 @@
                     parseInt($('#id_bd').val()),
                     parseInt($('#id_ad').val())
                 ],
-                "total": parseInt($('#id_bb').val()) + parseInt($('#id_ab').val()) + parseInt($('#id_bl').val()) + parseInt($('#id_al').val()) + parseInt($('#id_bd').val()) + parseInt($('#id_ad').val()),
+                "nod": [
+                    parseInt($('#id_bb_nod').val()),
+                    parseInt($('#id_ab_nod').val()),
+                    parseInt($('#id_bl_nod').val()),
+                    parseInt($('#id_al_nod').val()),
+                    parseInt($('#id_bd_nod').val()),
+                    parseInt($('#id_ad_nod').val())
+                ],
+                "total":
+                parseInt($('#id_bb').val()) * parseInt($('#id_bb_nod').val()) +
+                parseInt($('#id_ab').val()) * parseInt($('#id_ab_nod').val()) +
+                parseInt($('#id_bl').val()) * parseInt($('#id_bl_nod').val()) +
+                parseInt($('#id_al').val()) * parseInt($('#id_al_nod').val()) +
+                parseInt($('#id_bd').val()) * parseInt($('#id_bd_nod').val()) +
+                parseInt($('#id_ad').val()) * parseInt($('#id_ad_nod').val())
             });
             callback();
         }
@@ -259,7 +384,7 @@
                 button.onclick = function () {
                     var value = $(this).closest('tr').children('td:first').text();
                     if (value > -1) {
-                        table_data.splice(value - 1, 1)
+                        table_data.splice(value - 1, 1);
                         $(this).closest('tr').remove();
                         callback();
                     }

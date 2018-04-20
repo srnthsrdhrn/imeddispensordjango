@@ -38,7 +38,7 @@ demo = {
                 bottom: 0,
                 left: 0
             },
-        }
+        };
 
         var dailySalesChart = new Chartist.Line('#dailySalesChart', dataDailySalesChart, optionsDailySalesChart);
 
@@ -68,7 +68,7 @@ demo = {
                 bottom: 0,
                 left: 0
             },
-        }
+        };
 
         var dailySalesChart = new Chartist.Line('#dailySalesChart', dataDailySalesChart, optionsDailySalesChart);
 
@@ -97,7 +97,7 @@ demo = {
                 bottom: 0,
                 left: 0
             }
-        }
+        };
 
         var completedTasksChart = new Chartist.Line('#completedTasksChart', dataCompletedTasksChart, optionsCompletedTasksChart);
 
@@ -236,7 +236,7 @@ demo = {
                 }]
             }]
 
-        }
+        };
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
         var marker = new google.maps.Marker({
@@ -267,4 +267,4 @@ demo = {
 
 
 
-}
+};

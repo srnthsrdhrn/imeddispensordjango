@@ -24,10 +24,7 @@ class Chamber(models.Model):
     objects = CustomManager()
 
 
-
-
 class DispenseLog(models.Model):
-    prescription = models.ForeignKey(Prescription, related_name='dispenses')
     medicine = models.ManyToManyField(Medicine, related_name='dispenses')
     qty = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

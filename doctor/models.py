@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from datetime import datetime
+
 from django.db import models
 
 
@@ -41,6 +43,15 @@ class Prescription(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
     objects = CustomManager()
 
+    def __str__(self):
+        return self.doctor_note
+
+
+class ScheduleManager(models.Manager):
+    def get_query_set(self):
+        days = (datetime.now() - self.created_at).days
+        super(ScheduleManager, self).get_query_set().filter(no_of_days__lte=days)
+
 
 class Schedule(models.Model):
     BEFORE_BREAKFAST = 0
@@ -57,7 +68,14 @@ class Schedule(models.Model):
     composition = models.ForeignKey(Composition, related_name='schedules')
     slot = models.IntegerField(choices=SLOT_CHOICES, default=BEFORE_BREAKFAST)
     qty = models.IntegerField(default=0)
+    no_of_days = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
-    objects = CustomManager()
+    objects = ScheduleManager()
+
+    def __str__(self):
+        return self.composition.__str__()
+
+    def get_slot(self):
+        return self.SLOT_CHOICES[self.slot][1]

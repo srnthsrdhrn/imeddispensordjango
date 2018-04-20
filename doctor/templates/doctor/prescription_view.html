@@ -1,0 +1,28 @@
+{% extends 'admin_theme/dashboard.html' %}
+{% block content %}
+    <div class="row">
+        <div class="container-fluid">
+            <div class="panle panel-info">
+
+                <div class="panel-body">
+                    <table class="table table-responsive table-striped table-bordered">
+                        <tr>
+                            <th>Sl.no</th>
+                            <th>Composition</th>
+                            <th>Time</th>
+                            <th>No Of Days</th>
+                        </tr>
+                        {% for schedule in prescription.schedules.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ schedule.composition }}</td>
+                                <td>{{ schedule.get_slot }}</td>
+                                <td>{{ schedule.no_of_days }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

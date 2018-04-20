@@ -123,7 +123,7 @@
                 // fix for Android devices
                 // use <img> instead background image - more smoothly
                 useImgTag  : isAndroid
-            }
+            };
 
             if(_this.initImg()) {
                 _this.init();
@@ -146,7 +146,7 @@
             return false;
         }
         return true;
-    }
+    };
 
     Jarallax.prototype.init = function() {
         var _this = this,
@@ -203,7 +203,7 @@
                 _this.coverImage();
                 _this.clipContainer();
                 _this.onScroll();
-            })
+            });
 
             // remove default user background
             _this.$item.data('jarallax-original-styles', _this.$item.attr('style'));
@@ -239,12 +239,12 @@
         _this.image.$container.remove();
 
         delete _this.$item[0].jarallax;
-    }
+    };
 
     // round to 2 decimals
     Jarallax.prototype.round = function(num) {
         return Math.floor(num * 100) / 100;
-    }
+    };
 
     Jarallax.prototype.getImageSize = function(src, callback) {
         if(!src || !callback) {
@@ -254,9 +254,9 @@
         var tempImg = new Image();
         tempImg.onload = function() {
             callback(tempImg.width, tempImg.height)
-        }
+        };
         tempImg.src = src;
-    }
+    };
 
     // it will remove some image overlapping
     // overlapping occur due to an image position fixed inside absolute possition element (webkit based browsers works without any fix)
@@ -284,7 +284,7 @@
         } else {
             $styles.html(css);
         }
-    }
+    };
 
     Jarallax.prototype.coverImage = function() {
         var _this = this;

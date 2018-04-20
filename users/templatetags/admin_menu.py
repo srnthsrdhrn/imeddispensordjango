@@ -8,6 +8,16 @@ register = template.Library()
 @register.inclusion_tag('admin_theme/menu_bar.html')
 def show_admin_menu(user):
     main_menu = [
+        {
+            "name": "Dashboard",
+            "childs": [
+                {
+                    "name": "Dashboard",
+                    "url": reverse("user_dashboard"),
+                }
+            ]
+
+        },
 
         {
             "name": "Patient",
@@ -19,9 +29,9 @@ def show_admin_menu(user):
                         # "permission": 'kctusers.add_user'
                     },
 
-
                 ]
         },
+
     ]
 
     filtered_menu = []

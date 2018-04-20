@@ -1,0 +1,35 @@
+{% extends 'admin_theme/dashboard.html' %}
+{% block content %}
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4>Patient List</h4>
+        </div>
+        <div class="panel-body">
+            <table border="2" class="table table-responsive">
+                <tr>
+                    <center>
+                        <th>Sno</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Prescription Link</th>
+                    </center>
+
+                </tr>
+                {% for patient in patients %}
+                    <tr>
+                        <td>
+                            <center>{{ forloop.counter }}</center>
+                        </td>
+                        <td>{{ patient.first_name }}</td>
+                        <td>{{ patient.last_name }}</td>
+                        <td>{{ patient.email }}</td>
+                        <td><a href="{% url 'patient_prescription_view' patient.id %}">View <span class="fa fa-eye"></span> </a></td>
+                    </tr>
+                {% empty %}
+                    <h3> No Patients!</h3>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
