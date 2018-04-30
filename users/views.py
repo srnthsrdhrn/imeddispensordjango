@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
+
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,7 +28,12 @@ class LoginAPI(APIView):
         try:
             user = User.objects.get(username=username)
             if user.check_password(password):
-                return Response(UserSerializer(user).data)
+                if user.account_type == User.VENDOR:
+                    data = UserSerializer(user).data
+                    data['vendor_id'] = 'vendor-' + str(user.id)
+                    return Response(data)
+                else:
+                    return Response(UserSerializer(user).data)
             else:
                 return Response({'status': 'Username or Password Wrong'}, status=400)
         except User.DoesNotExist, e:

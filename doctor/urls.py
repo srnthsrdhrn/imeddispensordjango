@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^patient_list$', patient_list, name='patient_list'),
     url(r'^prescription/(?P<prescription_id>[0-9]+)', prescription_view, name='prescription_view'),
     url(r'^prescription_list/(?P<patient_id>[0-9]+)', patient_prescription_view, name='patient_prescription_view'),
+
 ]

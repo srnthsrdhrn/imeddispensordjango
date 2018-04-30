@@ -25,11 +25,15 @@ class Composition(models.Model):
 
 
 class Medicine(models.Model):
+    name = models.CharField(max_length=1000)
     composition = models.ForeignKey(Composition, related_name='medicines', limit_choices_to={'deleted_at': None})
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
     objects = CustomManager()
+
+    def __str__(self):
+        return self.name
 
 
 class Prescription(models.Model):

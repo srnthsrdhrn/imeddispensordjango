@@ -45,9 +45,11 @@ class User(AbstractUser):
             'composition').distinct()
         for composition in compositions:
             composition = Composition.objects.get(id=composition['composition'])
-            schedule = Schedule.objects.filter(prescription__patient=self,
-                                               composition=composition)
-            total = schedule.aggregate(Sum("qty"))['qty__sum']
+            schedules = Schedule.objects.filter(prescription__patient=self,
+                                                composition=composition)
+            total = 0
+            for schedule in schedules:
+                total += schedule.qty * schedule.no_of_days
             data.append({'composition': composition.name, 'quantity': total})
         return data
 

@@ -5,6 +5,7 @@ from django.db import models
 
 # Create your models here.
 from doctor.models import Medicine, Prescription, CustomManager, Composition
+from users.models import User
 
 
 class Device(models.Model):
@@ -16,8 +17,8 @@ class Device(models.Model):
 
 
 class Chamber(models.Model):
+    chamber_number = models.IntegerField(default=0)
     device = models.ForeignKey('Device', related_name='chambers')
-    medicine = models.ForeignKey(Medicine, null=True, blank=True, related_name='chambers')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -29,5 +30,20 @@ class DispenseLog(models.Model):
     qty = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
     objects = CustomManager()
+
+
+class Load(models.Model):
+    device = models.ForeignKey(Device, related_name='loads')
+    vendor = models.ForeignKey(User, related_name='vendor_loads')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class LoadData(models.Model):
+    load = models.ForeignKey(Load, related_name='load_data')
+    medicine = models.ForeignKey(Medicine, related_name='loads')
+    quantity = models.IntegerField(default=0)
+    chamber = models.ForeignKey(Chamber, related_name='loads')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
