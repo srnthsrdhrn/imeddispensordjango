@@ -1,10 +1,11 @@
 import json
 
 from dal import autocomplete
+from django.db.models import Sum
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dispenser.models import DispenseLog, Chamber, Device
+from dispenser.models import DispenseLog, Chamber, Device, LoadData
 from doctor.models import Composition, Prescription
 from doctor.models import Schedule
 from doctor.serializers import CompositionSerializer
@@ -102,9 +103,33 @@ class PrescriptionAPI(APIView):
             composition = Composition.objects.get(id=composition)
             load = \
                 device.loads.filter(load_data__medicine__composition=composition).order_by('created_at').reverse()[0]
-            chamb_number = load.load_data.get(medicine__composition=composition).chamber.chamber_number
+            load_Data = load.load_data.get(medicine__composition=composition)
+            chamb_number = load_Data.chamber.chamber_number
+            medicine_id = load_Data.medicine.id
+
+            datas = LoadData.objects.filter(load__device=device, medicine__composition=composition)
+            loaded_qty = 0
+            for data in datas:
+                if data.rate:
+                    loaded_qty += data.rate * data.quantity
+                else:
+                    loaded_qty += data.quantity
+            dispensed_qty = DispenseLog.objects.filter(device=device, medicine__composition=composition).aggregate(
+                Sum("qty"))['qty__sum']
+            if not loaded_qty:
+                loaded_qty = 0
+            if not dispensed_qty:
+                dispensed_qty = 0
+            qty_available_on_machine = loaded_qty - dispensed_qty
+
             total = 0
             for schedule in prescription.schedules.filter(composition=composition):
                 total += schedule.qty * schedule.no_of_days
-            data.append({'name': composition.name, 'qty': total, 'chamber_number': chamb_number})
+            dispensed_qty = prescription.dispenses.filter(medicine__composition=composition).aggregate(Sum("qty"))[
+                'qty__sum']
+            if not dispensed_qty:
+                dispensed_qty = 0
+            total -= dispensed_qty
+            data.append({'name': composition.name, 'id': medicine_id, 'qty': total, 'chamber_number': chamb_number,
+                         "qty_available_on_machine": qty_available_on_machine, 'rate': load_Data.rate})
         return Response(data)

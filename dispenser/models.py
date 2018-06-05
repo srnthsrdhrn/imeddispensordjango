@@ -26,6 +26,8 @@ class Chamber(models.Model):
 
 
 class DispenseLog(models.Model):
+    device = models.ForeignKey('Device', related_name='dispenses')
+    prescription = models.ForeignKey('doctor.Prescription', related_name='dispenses')
     medicine = models.ManyToManyField(Medicine, related_name='dispenses')
     qty = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -45,5 +47,6 @@ class LoadData(models.Model):
     medicine = models.ForeignKey(Medicine, related_name='loads')
     quantity = models.IntegerField(default=0)
     chamber = models.ForeignKey(Chamber, related_name='loads')
+    rate = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

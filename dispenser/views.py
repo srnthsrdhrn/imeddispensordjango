@@ -25,5 +25,9 @@ class VendorLoadAPI(APIView):
             medicine = data.get("medicine")
             medicine = Medicine.objects.get(name=medicine)
             qty = data.get("qty")
-            LoadData.objects.create(chamber=chamber, medicine=medicine, quantity=qty, load=load)
+            rate = data.get("rate")
+            if rate:
+                LoadData.objects.create(chamber=chamber, medicine=medicine, quantity=qty, load=load, rate=rate)
+            else:
+                LoadData.objects.create(chamber=chamber, medicine=medicine, quantity=qty, load=load)
         return Response({'status': "Success"})
