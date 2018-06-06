@@ -6,9 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from dispenser.models import DispenseLog, Chamber, Device, LoadData
-from doctor.models import Composition, Prescription
-from doctor.models import Schedule
-from doctor.serializers import CompositionSerializer
+from doctor.models import Composition, Prescription, Medicine
+from doctor.models import Item
+from doctor.serializers import CompositionSerializer, MedicineSerializer
 from users.models import User
 from users.serializers import UserSerializer, PrescriptionSerializer
 
@@ -42,7 +42,7 @@ class CompletePrescription(APIView):
             for id, qty in enumerate(item.get('slots')):
                 try:
                     if qty > 0:
-                        schedule = Schedule()
+                        schedule = Item()
                         schedule.prescription = prescription
                         schedule.composition_id = item.get("id")
                         schedule.slot = id
@@ -133,3 +133,9 @@ class PrescriptionAPI(APIView):
             data.append({'name': composition.name, 'id': medicine_id, 'qty': total, 'chamber_number': chamb_number,
                          "qty_available_on_machine": qty_available_on_machine, 'rate': load_Data.rate})
         return Response(data)
+
+
+class MedicineListAPI(APIView):
+    def get(self, request):
+        medicines = Medicine.objects.all()
+        return Response(MedicineSerializer(medicines, many=True).data)

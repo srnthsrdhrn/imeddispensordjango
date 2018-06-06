@@ -1,15 +1,15 @@
 from rest_framework import serializers
 
-from doctor.models import Schedule, Prescription
+from doctor.models import Item, Prescription
 from doctor.serializers import CompositionSerializer
 from users.models import User
 
 
-class ScheduleSerializer(serializers.ModelSerializer):
+class ItemSerializer(serializers.ModelSerializer):
     composition = CompositionSerializer()
 
     class Meta:
-        model = Schedule
+        model = Item
         fields = '__all__'
 
 
@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PrescriptionSerializer(serializers.ModelSerializer):
-    schedules = ScheduleSerializer(many=True)
+    schedules = ItemSerializer(many=True)
     doctor = UserSerializer()
     
     class Meta:

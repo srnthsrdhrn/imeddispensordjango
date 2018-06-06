@@ -19,8 +19,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 
-from dispenser.views import VendorLoadAPI
-from doctor.api_views import UserPrescriptionAPI, UserDetailAPI, PrescriptionAPI
+from dispenser.views import VendorLoadAPI, DeviceDetails
+from doctor.api_views import UserPrescriptionAPI, UserDetailAPI, PrescriptionAPI, MedicineListAPI
 from users.views import landing_page, login_success, LoginAPI
 
 urlpatterns = [
@@ -36,5 +36,8 @@ urlpatterns = [
     url(r'^api/v1/user_details', UserDetailAPI.as_view()),
     url(r'^api/v1/prescription', PrescriptionAPI.as_view()),
     url(r'^api/v1/load', VendorLoadAPI.as_view()),
+    url(r'^api/v1/device_data', DeviceDetails.as_view()),
+    url(r'^api/v1/medicine_list', MedicineListAPI.as_view()),
+
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

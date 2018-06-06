@@ -15,13 +15,14 @@ class CustomManager(models.Manager):
 
 class Composition(models.Model):
     name = models.CharField(max_length=1000)
+    dosage = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
     objects = CustomManager()
 
     def __str__(self):
-        return self.name
+        return self.name + " " + str(self.dosage) + "mg"
 
 
 class Medicine(models.Model):
@@ -33,7 +34,7 @@ class Medicine(models.Model):
     objects = CustomManager()
 
     def __str__(self):
-        return self.name
+        return self.name + " " + str(self.composition.dosage) + "mg"
 
 
 class Prescription(models.Model):
@@ -42,6 +43,9 @@ class Prescription(models.Model):
     patient = models.ForeignKey('users.User', limit_choices_to={'account_type': 2},
                                 related_name='patient_prescriptions')
     doctor_note = models.TextField(null=True, blank=True, help_text='Doctor Note')
+    scanned_copy = models.ImageField(null=True, blank=True)
+    pharmacist = models.ForeignKey('users.User', related_name='prescriptions_uploaded', null=True, blank=True)
+    finished = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -51,13 +55,13 @@ class Prescription(models.Model):
         return self.doctor_note
 
 
-class ScheduleManager(models.Manager):
+class ItemManager(models.Manager):
     def get_query_set(self):
         days = (datetime.now() - self.created_at).days
-        super(ScheduleManager, self).get_query_set().filter(no_of_days__lte=days)
+        super(ItemManager, self).get_query_set().filter(no_of_days__lte=days)
 
 
-class Schedule(models.Model):
+class Item(models.Model):
     BEFORE_BREAKFAST = 0
     AFTER_BREAKFAST = 1
     BEFORE_LUNCH = 2
@@ -68,18 +72,40 @@ class Schedule(models.Model):
     SLOT_CHOICES = (
         (BEFORE_BREAKFAST, "Before Breakfast"), (AFTER_BREAKFAST, "After Breakfast"), (BEFORE_LUNCH, "Before Lunch"),
         (AFTER_LUNCH, "After Lunch"), (BEFORE_DINNER, "Before Dinner"), (AFTER_DINNER, "After Dinner"))
-    prescription = models.ForeignKey(Prescription, related_name='schedules')
-    composition = models.ForeignKey(Composition, related_name='schedules')
-    slot = models.IntegerField(choices=SLOT_CHOICES, default=BEFORE_BREAKFAST)
-    qty = models.IntegerField(default=0)
+    composition = models.ForeignKey('Composition', related_name='prescribed_list')
+    prescription = models.ForeignKey('Prescription', related_name='items')
+    quantity = models.IntegerField()
+    slot = models.IntegerField(choices=SLOT_CHOICES)
     no_of_days = models.IntegerField(default=1)
+    finished = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
-    objects = ScheduleManager()
+    objects = ItemManager()
 
-    def __str__(self):
-        return self.composition.__str__()
-
-    def get_slot(self):
-        return self.SLOT_CHOICES[self.slot][1]
+# class Schedule(models.Model):
+#     BEFORE_BREAKFAST = 0
+#     AFTER_BREAKFAST = 1
+#     BEFORE_LUNCH = 2
+#     AFTER_LUNCH = 3
+#     BEFORE_DINNER = 4
+#     AFTER_DINNER = 5
+#
+#     SLOT_CHOICES = (
+#         (BEFORE_BREAKFAST, "Before Breakfast"), (AFTER_BREAKFAST, "After Breakfast"), (BEFORE_LUNCH, "Before Lunch"),
+#         (AFTER_LUNCH, "After Lunch"), (BEFORE_DINNER, "Before Dinner"), (AFTER_DINNER, "After Dinner"))
+#     prescription = models.ForeignKey(Prescription, related_name='schedules')
+#     composition = models.ForeignKey(Composition, related_name='schedules')
+#     slot = models.IntegerField(choices=SLOT_CHOICES, default=BEFORE_BREAKFAST)
+#     qty = models.IntegerField(default=0)
+#     no_of_days = models.IntegerField(default=1)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     deleted_at = models.DateTimeField(null=True)
+#     objects = ScheduleManager()
+#
+#     def __str__(self):
+#         return self.composition.__str__()
+#
+#     def get_slot(self):
+#         return self.SLOT_CHOICES[self.slot][1]
