@@ -1,0 +1,28 @@
+{% load crispy_forms_tags%}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    </head>
+    <body>
+      <div>
+        <div  id ="outer" >
+          <div class="page-header">
+            <h2 style="align-text:center;">Add A Device</h2>
+            <div style="width:400px; margin:0 auto;">
+                <form method="POST" class="post-form">{% csrf_token %}
+                    {{ form | crispy  }}
+                    {% for error in form.non_field_errors %}
+                    <div class="form-group has-errors text-danger small">
+                        {{error}}
+                    </div>
+                    {% endfor %}
+                    <button class="btn btn-primary" style="width: 150px; margin: auto;">Save</button>
+                  </div>
+            </div>
+            </form>
+        </div>
+      </div>
+    </body>
+</html>

@@ -4,17 +4,20 @@ from __future__ import unicode_literals
 # Create your views here.
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.http import HttpResponse
 from dispenser.models import Device, Chamber, Load, LoadData
 from dispenser.serializers import DeviceSerializer
 from doctor.models import Medicine
 from users.models import User
-
+from django.shortcuts import render
+from django.views.generic.edit import CreateView,UpdateView,DeleteView
+from django.http import HttpResponseRedirect
+from .forms import PostForm
 
 class VendorLoadAPI(APIView):
     def post(self, request):
         datas = request.data
-        # datas = json.loads(datas)
+        datas = json.loads(datas)
         vendor_id = datas.get("vendor_id")
         device_id = datas.get("device_id")
         if vendor_id and device_id:
@@ -41,3 +44,20 @@ class DeviceDetails(APIView):
         device_id = request.GET.get("device_id")
         device = Device.objects.get(id=device_id)
         return Response(DeviceSerializer(device).data)
+
+def Dev(request):
+    dis=Device.objects.all()
+    context={"dis":dis,}
+    return render(request,'dispenser/dispenser.html',context)
+
+def post_new(request):
+    form = PostForm()
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save()
+            post.save()
+            return HttpResponseRedirect('/dispenser/')
+    else:
+        form = PostForm()
+    return render(request, 'dispenser/device_form.html', {'form': form})
