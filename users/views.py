@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
-
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -40,12 +38,27 @@ class LoginAPI(APIView):
             return Response({'status': 'User does not exists'}, status=400)
 
 
+class DeviceAuthenticate(APIView):
+    def post(self, request):
+        aadhar = request.POST.get("aadhar")
+        pin = request.POST.get("pin")
+        user = User.objects.get(aadhar_number=aadhar)
+        try:
+            if user.pin == int(pin):
+
+                return Response(UserSerializer(user).data)
+            else:
+                return Response({'error': 'Wrong Credentials'}, status=400)
+        except Exception, e:
+            return Response({'error': 'Wrong Credentials'}, status=400)
+
+
 class PrescriptionAPI(APIView):
     def get(self, request):
+        aadhar = request.GET.get("aadhar")
         username = request.GET.get("username")
-        user_id = request.GET.get("user_id")
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(aadhar_number=aadhar)
             if user.username == username:
                 prescriptions = user.patient_prescriptions.all().order_by('-created_at')
                 return Response(PrescriptionSerializer(prescriptions, many=True).data)

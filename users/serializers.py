@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PrescriptionSerializer(serializers.ModelSerializer):
-    schedules = ItemSerializer(many=True)
+    items = ItemSerializer(many=True)
     doctor = UserSerializer()
     
     class Meta:

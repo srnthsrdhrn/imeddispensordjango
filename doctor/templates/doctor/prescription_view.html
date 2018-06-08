@@ -9,15 +9,18 @@
                         <tr>
                             <th>Sl.no</th>
                             <th>Composition</th>
+                            <th>Quantity</th>
                             <th>Time</th>
                             <th>No Of Days</th>
                         </tr>
-                        {% for schedule in prescription.schedules.all %}
+                        {% for item in prescription.items.all %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ schedule.composition }}</td>
-                                <td>{{ schedule.get_slot }}</td>
-                                <td>{{ schedule.no_of_days }}</td>
+                                <td>{{ item.composition }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.get_slot_display }}</td>
+                                <td>{{ item.no_of_days }}</td>
+
                             </tr>
                         {% endfor %}
                     </table>

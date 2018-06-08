@@ -21,6 +21,7 @@ class User(AbstractUser):
     dob = models.DateField(null=True, blank=True)
     aadhar_number = models.BigIntegerField(null=True, blank=True, unique=True)
     account_type = models.IntegerField(choices=ACCOUNT_TYPES, default=PATIENT)
+    pin = models.IntegerField(max_length=4)
     profile_pic = models.ImageField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
