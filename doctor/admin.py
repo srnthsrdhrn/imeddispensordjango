@@ -9,3 +9,5 @@ from doctor.models import Composition, Medicine, Prescription
 admin.site.register(Composition)
 admin.site.register(Medicine)
 admin.site.register(Prescription)
+
+

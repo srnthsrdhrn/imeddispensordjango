@@ -11,4 +11,4 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Device
-        fields = ('id','lat','lng','location','vendor')
+        fields = ('lat','lng','location','vendor')
