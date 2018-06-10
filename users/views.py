@@ -66,3 +66,20 @@ class PrescriptionAPI(APIView):
                 return Response({'status': "Wrong Data"})
         except User.DoesNotExist, e:
             return Response({'status': 'User Does Not Exist'}, status=400)
+
+
+class StoreSession(APIView):
+    def get(self, request):
+        link = request.GET.get("link")
+        if link:
+            f = open("link_storage.txt", "w")
+            f.write(link)
+            return Response({"success": "Stored"})
+        else:
+            return Response({"error": "Link Missing"}, status=400)
+
+
+def access_pi(request):
+    f = open("link_storage.txt")
+    link = f.read()
+    return redirect(link)

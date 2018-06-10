@@ -19,13 +19,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 
-from dispenser.views import VendorLoadAPI,DeviceDetails
-from doctor.api_views import UserPrescriptionAPI, UserDetailAPI, PrescriptionAPI,MedicineListAPI
-from users.views import landing_page, login_success, LoginAPI, PrescriptionAPI as prescription
+from dispenser.views import VendorLoadAPI, DeviceDetails, DispenseLogAPI
+from doctor.api_views import UserPrescriptionAPI, UserDetailAPI, PrescriptionAPI, MedicineListAPI
+from users.views import landing_page, login_success, LoginAPI, PrescriptionAPI as prescription, DeviceAuthenticate, \
+    access_pi
 
 urlpatterns = [
     url(r'^$', landing_page, name='landing_page'),
     url(r'^admin/', admin.site.urls),
+    url(r'^access_pi', access_pi),
     url(r'^users/', include('users.urls')),
     url(r'^login', login, name='login'),
     url(r'^logout', logout, name='logout'),
@@ -40,6 +42,7 @@ urlpatterns = [
     url(r'^api/v1/load', VendorLoadAPI.as_view()),
     url(r'^api/v1/device_data', DeviceDetails.as_view()),
     url(r'^api/v1/medicine_list', MedicineListAPI.as_view()),
+    url(r'^api/v1/dispense_log', DispenseLogAPI.as_view()),
     url(r'^dispenser/', include('dispenser.urls')),
 
 ]

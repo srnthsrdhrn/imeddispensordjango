@@ -45,6 +45,7 @@ class Prescription(models.Model):
     doctor_note = models.TextField(null=True, blank=True, help_text='Doctor Note')
     scanned_copy = models.ImageField(null=True, blank=True)
     pharmacist = models.ForeignKey('users.User', related_name='prescriptions_uploaded', null=True, blank=True)
+    dispensed = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -6,11 +6,10 @@ from django.db import models
 # Create your models here.
 from doctor.models import Medicine, Prescription, CustomManager, Composition
 from users.models import User
-from django.core.urlresolvers import reverse
 
 
 class Device(models.Model):
-    id=models.IntegerField(primary_key=True , default=0)
+    id = models.IntegerField(primary_key=True, default=0)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     location = models.TextField(null=True, blank=True)
@@ -20,10 +19,8 @@ class Device(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
-
     def __str__(self):
-        return ("\nlat:"+str(self.lat)+"\nlng:"+str(self.lng)+"\nLocation:"+self.location+"\n")
-
+        return ("\nlat:" + str(self.lat) + "\nlng:" + str(self.lng) + "\nLocation:" + self.location + "\n")
 
 
 class Chamber(models.Model):
@@ -46,7 +43,7 @@ class Chamber(models.Model):
 class DispenseLog(models.Model):
     chamber = models.ForeignKey('Chamber', related_name='dispenses')
     prescription = models.ForeignKey('doctor.Prescription', related_name='dispenses')
-    medicine = models.ManyToManyField(Medicine, related_name='dispenses')
+    medicine = models.ForeignKey(Medicine, related_name='dispenses')
     quantity = models.IntegerField(default=0)
     finished = models.BooleanField(default=False)
     actual_composition = models.ForeignKey('doctor.Composition', related_name='changed_dispenses', null=True,
