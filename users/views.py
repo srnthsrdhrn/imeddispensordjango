@@ -83,3 +83,15 @@ def access_pi(request):
     f = open("link_storage.txt")
     link = f.read()
     return redirect(link)
+
+
+class ScheduleAPI(APIView):
+    def get(self, request):
+        user_id = request.GET.get("user_id")
+        aadhar = request.GET.get("aadhar")
+        if user_id and aadhar:
+            user = User.objects.get(id=user_id)
+            if user.aadhar_number == aadhar:
+                pass
+            else:
+                return Response({"status": "Wrong Credentials"}, status=400)
