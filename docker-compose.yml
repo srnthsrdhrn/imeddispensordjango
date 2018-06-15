@@ -1,0 +1,52 @@
+web:
+  restart: always
+  build: .
+  ports:
+    - 8025:8000
+  expose:
+    - 8000
+  volumes:
+    - imed_media:/usr/src/app/media/
+  env_file: production.env
+  links:
+    - postgres:postgres
+#    - redis:redis
+  command: sh '/usr/src/app/run_web.sh'
+  labels:
+    traefik.backend: "imed"
+    traefik.enable: "true"
+    traefik.frontend.rule: "Host: imed.iqube.io"
+postgres:
+  restart: always
+  image: postgres:latest
+  env_file: production.env
+  ports:
+    - "5445:5432"
+  volumes:
+    - imedpgdata:/var/lib/postgresqql/data/
+
+#redis:
+#  restart: always
+#  image: redis:latest
+#  expose:
+#    - 6379
+#
+#worker:
+#  restart: always
+#  env_file: production.env
+#  build: .
+#  volumes:
+#    - kct_wallet_media:/usr/src/app/media/
+#  links:
+#    - postgres:postgres
+#    - redis:redis
+#  command: sh '/usr/src/app/run_celery.sh'
+#flower:
+#  restart: always
+#  build: .
+#  env_file: production.env
+#  links:
+#    - redis:redis
+#  ports:
+#   - "5555:5555"
+#  command: sh '/usr/src/app/run_flower.sh'
