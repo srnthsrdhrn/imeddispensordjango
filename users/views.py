@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
-
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -40,12 +38,26 @@ class LoginAPI(APIView):
             return Response({'status': 'User does not exists'}, status=400)
 
 
+class DeviceAuthenticate(APIView):
+    def post(self, request):
+        aadhar = request.POST.get("aadhar")
+        pin = request.POST.get("pin")
+        user = User.objects.get(aadhar_number=aadhar)
+        try:
+            if user.pin == int(pin):
+                return Response(UserSerializer(user).data)
+            else:
+                return Response({'error': 'Wrong Credentials'}, status=400)
+        except Exception, e:
+            return Response({'error': 'Error in Request ' + e.message}, status=400)
+
+
 class PrescriptionAPI(APIView):
     def get(self, request):
+        aadhar = request.GET.get("aadhar")
         username = request.GET.get("username")
-        user_id = request.GET.get("user_id")
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(aadhar_number=aadhar)
             if user.username == username:
                 prescriptions = user.patient_prescriptions.all().order_by('-created_at')
                 return Response(PrescriptionSerializer(prescriptions, many=True).data)
@@ -53,3 +65,32 @@ class PrescriptionAPI(APIView):
                 return Response({'status': "Wrong Data"})
         except User.DoesNotExist, e:
             return Response({'status': 'User Does Not Exist'}, status=400)
+
+
+class StoreSession(APIView):
+    def get(self, request):
+        link = request.GET.get("link")
+        if link:
+            f = open("link_storage.txt", "w")
+            f.write(link)
+            return Response({"success": "Stored"})
+        else:
+            return Response({"error": "Link Missing"}, status=400)
+
+
+def access_pi(request):
+    f = open("link_storage.txt")
+    link = f.read()
+    return redirect(link)
+
+
+class ScheduleAPI(APIView):
+    def get(self, request):
+        user_id = request.GET.get("user_id")
+        aadhar = request.GET.get("aadhar")
+        if user_id and aadhar:
+            user = User.objects.get(id=user_id)
+            if user.aadhar_number == aadhar:
+                pass
+            else:
+                return Response({"status": "Wrong Credentials"}, status=400)

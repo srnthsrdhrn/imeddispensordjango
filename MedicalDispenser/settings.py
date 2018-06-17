@@ -17,15 +17,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '9n0*9)*7p@9dwcc54l+&li6$p5kzekg5oy2v&gs689z+eu-!)+'
-
+SECRET_KEY = os.environ.get("SECRET_KEY", "4yljy#v)c))5wxdkuw@2bk_lk%hf9*$8g!zkx)r+myp!+e3b9k")
+IS_PRODUCTION = os.environ.get("IS_PRODUCTION", False)
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not IS_PRODUCTION
 
 ALLOWED_HOSTS = ['*']
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +41,7 @@ INSTALLED_APPS = [
     'dal_select2',
     'dal',
     'rest_framework',
+    'cashier',
 ]
 
 MIDDLEWARE = [
@@ -78,12 +77,24 @@ WSGI_APPLICATION = 'MedicalDispenser.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if IS_PRODUCTION:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['POSTGRES_USER'],
+            'USER': os.environ['POSTGRES_USER'],
+            'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+            'HOST': 'postgres',
+            'PORT': os.environ['POSTGRES_PORT']
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -135,3 +146,12 @@ LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+MULTICHAIN_USER = 'multichainrpc'
+MULTICHAIN_PASS = '79pgKQusiH3VDVpyzsM6e3kRz6gWNctAwgJvymG3iiuz'
+MULTICHAIN_PORT = '8000'
+MULTICHAIN_ASSET = 'ikash'
+MULTICHAIN_ASSET_NKASH = 'inkash'
+MULTICHAIN_HOST = '192.168.56.3'
+MULTICHAIN_CHAIN = 'dockerchain'
+MULTICHAIN_BURN_ADDRESS = '1XXXXXXXJtXXXXXXVhXXXXXXU6XXXXXXUHj348'
+

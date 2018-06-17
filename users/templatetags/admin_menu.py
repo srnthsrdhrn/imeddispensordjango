@@ -14,6 +14,15 @@ def show_admin_menu(user):
                 {
                     "name": "Dashboard",
                     "url": reverse("user_dashboard"),
+                },
+                {
+                    "name": "User Recharge",
+                    "url": reverse("cashier_recharge")
+                },
+                {
+                    "name": "User Balance Check",
+                    "url": reverse("cashier_balance")
+
                 }
             ]
 
