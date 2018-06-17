@@ -41,6 +41,37 @@ def show_admin_menu(user):
                 ]
         },
 
+        {
+            "name": "Vendor",
+            "childs":
+                [
+                    {
+                        "name": "Device list",
+                        "url": reverse("devices_list"),
+                        # "permission": 'kctusers.add_user'
+                    },
+
+                ]
+        },
+        {
+            "name": "Admin",
+            "childs":
+                [
+                    {
+                        "name": "Create Device",
+                        "url": reverse("insert_device"),
+                        # "permission": 'kctusers.add_user'
+ 
+                    },
+                                        {
+                        "name": "Device list",
+                        "url": reverse("devices_list"),
+                        # "permission": 'kctusers.add_user'
+ 
+                    },
+
+                ]
+        },
     ]
 
     filtered_menu = []

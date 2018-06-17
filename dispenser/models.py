@@ -9,7 +9,6 @@ from users.models import User
 
 
 class Device(models.Model):
-    id = models.IntegerField(primary_key=True, default=0)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     location = models.TextField(null=True, blank=True)
