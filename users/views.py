@@ -45,12 +45,11 @@ class DeviceAuthenticate(APIView):
         user = User.objects.get(aadhar_number=aadhar)
         try:
             if user.pin == int(pin):
-
                 return Response(UserSerializer(user).data)
             else:
                 return Response({'error': 'Wrong Credentials'}, status=400)
         except Exception, e:
-            return Response({'error': 'Wrong Credentials'}, status=400)
+            return Response({'error': 'Error in Request ' + e.message}, status=400)
 
 
 class PrescriptionAPI(APIView):

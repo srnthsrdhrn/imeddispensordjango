@@ -1,0 +1,28 @@
+{% extends 'admin_theme/dashboard.html' %}
+
+
+{% load crispy_forms_tags %}
+{% block content %}
+    <section class="content-header">
+        <h1>Check Balnce - user</h1>
+    </section>
+    <section class="content">
+
+        <div class="row">
+            <div class="col-md-12">
+                {% crispy form %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                {% if user %}
+                    Name : {{ user.first_name }} {{ user.last_number }}<br>
+                    Aadhar Number : {{ user.aadhar_number }} <br>
+                    Balance : Rs. {{ user.get_wallet_balance }}
+                {% endif %}
+            </div>
+
+        </div>
+    </section>
+{% endblock %}

@@ -192,7 +192,7 @@ class PrescriptionAPI(APIView):
                     {'composition_name': composition.__str__(), 'composition_id': composition.id,
                      'prescribed_qty': required_qty, 'dispensed_qty': dispensed_qty,
                      'medicine_id': medicine_id, 'max_dispensable_qty': max_dispensable_qty, 'medicine': medicine,
-                     'multiplier': multiplier,
+                     'multiplier': multiplier, 'medicine_amount': dosage_medicine.price,
                      'is_available': is_available})
             else:
                 data.append(

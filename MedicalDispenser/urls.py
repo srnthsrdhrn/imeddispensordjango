@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^api/v1/medicine_list', MedicineListAPI.as_view()),
     url(r'^api/v1/dispense_log', DispenseLogAPI.as_view()),
     url(r'^dispenser/', include('dispenser.urls')),
+    url(r"cashier/", include("cashier.urls")),
 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
