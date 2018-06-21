@@ -20,9 +20,10 @@ from django.contrib import admin
 from django.contrib.auth.views import login, logout
 
 from dispenser.views import VendorLoadAPI, DeviceDetails, DispenseLogAPI
-from doctor.api_views import UserPrescriptionAPI, UserDetailAPI, PrescriptionAPI, MedicineListAPI
+from doctor.api_views import UserPrescriptionAPI, UserDetailAPI, PrescriptionAPI, MedicineListAPI, DeviceChamberAPI, \
+    PrescriptionDetailAPI
 from users.views import landing_page, login_success, LoginAPI, PrescriptionAPI as prescription, DeviceAuthenticate, \
-    access_pi
+    access_pi, PaymentOverride
 
 urlpatterns = [
     url(r'^$', landing_page, name='landing_page'),
@@ -33,18 +34,21 @@ urlpatterns = [
     url(r'^logout', logout, name='logout'),
     url(r'^accounts/profile/$', login_success),
     url(r'^doctor/', include('doctor.urls')),
-    url(r'^api/v1/login', LoginAPI.as_view()),
-    url(r'^api/v1/authenticate', DeviceAuthenticate.as_view()),
-    url(r'^api/v1/user_prescription', UserPrescriptionAPI.as_view()),
+    url(r'^api/v1/login$', LoginAPI.as_view()),
+    url(r'^api/v1/authenticate$', DeviceAuthenticate.as_view()),
+    url(r'^api/v1/user_prescription$', UserPrescriptionAPI.as_view()),
     url(r'^api/v1/user_details', UserDetailAPI.as_view()),
-    url(r'^api/v1/prescription', PrescriptionAPI.as_view()),
-    url(r'^api/v1/user_1_prescription', prescription.as_view()),
-    url(r'^api/v1/load', VendorLoadAPI.as_view()),
-    url(r'^api/v1/device_data', DeviceDetails.as_view()),
-    url(r'^api/v1/medicine_list', MedicineListAPI.as_view()),
-    url(r'^api/v1/dispense_log', DispenseLogAPI.as_view()),
+    url(r'^api/v1/prescription$', PrescriptionAPI.as_view()),
+    url(r'^api/v1/user_1_prescription$', prescription.as_view()),
+    url(r'^api/v1/load$', VendorLoadAPI.as_view()),
+    url(r'^api/v1/device_data$', DeviceDetails.as_view()),
+    url(r'^api/v1/device_chamber_data$', DeviceChamberAPI.as_view()),
+    url(r'^api/v1/medicine_list$', MedicineListAPI.as_view()),
+    url(r'^api/v1/dispense_log$', DispenseLogAPI.as_view()),
     url(r'^dispenser/', include('dispenser.urls')),
     url(r"cashier/", include("cashier.urls")),
-
+    url(r'^api/v1/prescription_details$', PrescriptionDetailAPI.as_view()),
+    url(r'^pos/', include('pos.urls')),
+    url(r'^api/v1/payment_override', PaymentOverride.as_view())
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

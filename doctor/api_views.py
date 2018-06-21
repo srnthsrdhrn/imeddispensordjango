@@ -1,11 +1,13 @@
 import json
+from datetime import datetime
 
 from dal import autocomplete
 from django.db.models import Sum
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dispenser.models import DispenseLog, Chamber, Device, Load, LoadData
+from MedicalDispenser.settings import SERVER_URL
+from dispenser.models import Chamber, Device, Load, LoadData
 from doctor.models import Composition, Prescription, Medicine
 from doctor.models import Item
 from doctor.serializers import CompositionSerializer, MedicineSerializer
@@ -18,6 +20,22 @@ class CompositionAutoComplete(autocomplete.Select2QuerySetView):
         query_set = Composition.objects.all()
         if self.q:
             query_set = Composition.objects.filter(name__icontains=self.q).order_by('name')
+        return query_set
+
+
+class DoctorAutoComplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        query_set = User.objects.filter(account_type=User.DOCTOR)
+        if self.q:
+            query_set = query_set.filter(name__icontains=self.q).order_by('name')
+        return query_set
+
+
+class PatientAutoComplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        query_set = User.objects.filter(account_type=User.PATIENT).order_by('first_name')
+        if self.q:
+            query_set = query_set.filter(aadhar_number__icontains=self.q).order_by('first_name')
         return query_set
 
 
@@ -63,21 +81,6 @@ class UserPrescriptionAPI(APIView):
             return Response(PrescriptionSerializer(prescriptions, many=True).data)
         except Exception, e:
             return Response({'error': 'Aadhar Number Missing'})
-
-
-class DispenseLogAPI(APIView):
-    def get(self, request):
-        data = request.GET.get("data", None)
-        if data:
-            data = json.loads(data)
-            for item in data:
-                chamber_id = data.get("chamber_id", None)
-                chamber = Chamber.objects.get(id=chamber_id)
-                medicine = chamber.medicine.composition
-                qty = item.get("quantity")
-                DispenseLog.objects.create(medicine=medicine, qty=qty)
-            return Response("Success")
-        return Response("Error Data Missing", status=400)
 
 
 class UserDetailAPI(APIView):
@@ -233,3 +236,124 @@ class MedicineListAPI(APIView):
     def get(self, request):
         medicines = Medicine.objects.all()
         return Response(MedicineSerializer(medicines, many=True).data)
+
+
+class OTCMedicineListAPI(APIView):
+    def get(self, request):
+        device_id = request.GET.get("device_id")
+        if device_id:
+            device_id = int(device_id)
+            device = Device.objects.get(id=device_id)
+            medicines = Medicine.objects.filter(otc=True)
+            available_qty = 0
+            data = []
+            for medicine in medicines:
+                loadsd = LoadData.objects.filter(medicine=medicine, chamber__device=device)
+                vacuum = False
+                for loadData in loadsd:
+                    dispensed__qty = loadData.dispenses.all().aggregate(Sum('quantity'))[
+                        'quantity__sum']
+                    if not dispensed__qty:
+                        dispensed__qty = 0
+                    loaded_qty = loadData.quantity
+                    if loadData.rate:
+                        loaded_qty = loadData.quantity * loadData.rate
+                    qty = loaded_qty - dispensed__qty
+                    if loadData.chamber.type == Chamber.VACUUM:
+                        if not vacuum:
+                            available_qty += (5 if qty > 5 else qty)
+                            vacuum = True
+                    else:
+                        available_qty += qty
+                    data.append({
+                        'medicine_name': medicine.name,
+                        'stock': available_qty,
+                        'price': medicine.price,
+                        'medicine_id': medicine.id,
+                        'id': medicine.id,
+                        'image': SERVER_URL + medicine.image.url
+                    })
+            return Response(data)
+        else:
+            return Response({"Error": "Bad Request"}, status=400)
+
+
+class DeviceChamberAPI(APIView):
+    def get(self, request):
+        device_id = request.GET.get("device_id")
+        if device_id:
+            device = Device.objects.get(id=device_id)
+            loads = device.loads.filter(dispensed=False, load_data__expired=False).values('id').distinct()
+            chamber_data = []
+            medicines = loads.values('load_data__medicine').distinct()
+            for load in loads:
+                load_id = load['id']
+                load = Load.objects.get(id=load_id)
+                for load_data in load.load_data.all().order_by('-rate'):
+                    dict = {}
+                    dict['chamber_id'] = load_data.chamber.id
+                    dict['chamber'] = load_data.chamber.name
+                    dict['load_data'] = load_data.id
+                    dict['medicine_id'] = load_data.medicine.id
+                    if load_data.medicine.otc:
+                        dict['medicine'] = load_data.medicine.name
+                    else:
+                        dict['medicine'] = load_data.medicine.__str__()
+                    dict['composition'] = load_data.medicine.composition.__str__()
+                    dispensed_count = load_data.dispenses.all().aggregate(Sum('quantity'))['quantity__sum']
+                    if not dispensed_count:
+                        dispensed_count = 0
+                    dict['rate'] = load_data.rate
+                    if load_data.rate:
+                        dict['available_qty'] = (load_data.quantity * load_data.rate) - dispensed_count
+                    else:
+                        dict['available_qty'] = load_data.quantity - dispensed_count
+                    dict['name'] = load_data.chamber.name
+                    dict['type'] = load_data.chamber.type
+                    chamber_data.append(dict)
+            return Response(chamber_data)
+
+
+class PrescriptionDetailAPI(APIView):
+    def get(self, request):
+        prescription_id = request.GET.get("id")
+        prescription = Prescription.objects.get(id=prescription_id)
+        compositions = prescription.items.values('composition').distinct()
+        response = {'doctor': prescription.doctor.first_name + " " + prescription.doctor.last_name,
+                    'aadhar_number': prescription.patient.aadhar_number,
+                    'patient_name': prescription.patient.first_name + " " + prescription.patient.last_name,
+                    'date': datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
+        datas = []
+        for composition in compositions:
+            composition = composition['composition']
+            composition = Composition.objects.get(id=composition)
+            items = prescription.items.filter(composition=composition)
+            data = {'medicine': composition.medicines.all()[0].__str__(), 'B': 0, 'L': 0, 'D': 0, 'Aft': 0, 'Bfr': 0}
+            for item in items:
+                if item.slot == item.BEFORE_BREAKFAST:
+                    data['B'] = item.quantity
+                    data['Bfr'] = u'\u2713'
+                    data['Aft'] = ''
+                elif item.slot == item.AFTER_BREAKFAST:
+                    data['B'] = item.quantity
+                    data['Aft'] = u'\u2713'
+                    data['Bfr'] = ''
+                elif item.slot == item.BEFORE_LUNCH:
+                    data['L'] = item.quantity
+                    data['Bfr'] = u'\u2713'
+                    data['Aft'] = ''
+                elif item.slot == item.AFTER_LUNCH:
+                    data['L'] = item.quantity
+                    data['Aft'] = u'\u2713'
+                    data['Bfr'] = ''
+                elif item.slot == item.BEFORE_DINNER:
+                    data['D'] = item.quantity
+                    data['Bfr'] = u'\u2713'
+                    data['Aft'] = ''
+                elif item.slot == item.AFTER_DINNER:
+                    data['D'] = item.quantity
+                    data['Aft'] = u'\u2713'
+                    data['Bfr'] = ''
+            datas.append(data)
+        response['data'] = datas
+        return Response(response)

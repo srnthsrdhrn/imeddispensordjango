@@ -42,9 +42,13 @@ INSTALLED_APPS = [
     'dal',
     'rest_framework',
     'cashier',
+    'pos',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'MedicalDispenser.urls'
 
@@ -146,12 +151,21 @@ LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-MULTICHAIN_USER = 'multichainrpc'
-MULTICHAIN_PASS = '79pgKQusiH3VDVpyzsM6e3kRz6gWNctAwgJvymG3iiuz'
-MULTICHAIN_PORT = '8000'
-MULTICHAIN_ASSET = 'ikash'
-MULTICHAIN_ASSET_NKASH = 'inkash'
-MULTICHAIN_HOST = '192.168.56.3'
-MULTICHAIN_CHAIN = 'dockerchain'
-MULTICHAIN_BURN_ADDRESS = '1XXXXXXXJtXXXXXXVhXXXXXXU6XXXXXXUHj348'
+# MULTICHAIN_USER = 'multichainrpc'
+# MULTICHAIN_PASS = '79pgKQusiH3VDVpyzsM6e3kRz6gWNctAwgJvymG3iiuz'
+# MULTICHAIN_PORT = '8000'
+# MULTICHAIN_ASSET = 'ikash'
+# MULTICHAIN_ASSET_NKASH = 'inkash'
+# MULTICHAIN_HOST = '192.168.56.3'
+# MULTICHAIN_CHAIN = 'dockerchain'
+# MULTICHAIN_BURN_ADDRESS = '1XXXXXXXJtXXXXXXVhXXXXXXU6XXXXXXUHj348'
 
+INSTA_MOJO_SALT = '5a38744bcd8847908db2df1a507075d9'
+INSTA_MOJO_API_KEY = '17583a21e44a3561341fc2c1a2acc954'
+INSTA_MOJO_AUTH_TOKEN = 'e6229891554c3db98e1185fc31ac5f78'
+
+INSTA_MOJO_SALT_TEST = 'f8b93c9043964862847387d044e4e79d'
+INSTA_MOJO_API_KEY_TEST = 'test_d0df5b44a987c41dbc7aa75e560'
+INSTA_MOJO_AUTH_TOKEN_TEST = 'test_6beb5ae2edb00396e835f8379b4'
+
+SERVER_URL = 'http://192.168.43.192:8000'

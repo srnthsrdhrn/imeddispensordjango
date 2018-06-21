@@ -14,14 +14,9 @@ class ItemSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    balance = serializers.SerializerMethodField()
-
-    def get_balance(self, obj):
-        return obj.get_wallet_balance()
-
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'id', 'email', 'aadhar_number', 'username', 'profile_pic','balance')
+        fields = ('first_name', 'last_name', 'id', 'email', 'aadhar_number', 'username', 'profile_pic','mobile_number')
 
 
 class PrescriptionSerializer(serializers.ModelSerializer):

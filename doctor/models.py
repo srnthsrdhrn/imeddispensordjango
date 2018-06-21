@@ -29,6 +29,8 @@ class Medicine(models.Model):
     name = models.CharField(max_length=1000)
     composition = models.ForeignKey(Composition, related_name='medicines', limit_choices_to={'deleted_at': None})
     price = models.FloatField(null=True, blank=True)
+    otc = models.BooleanField(default=False)
+    image = models.ImageField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -82,7 +84,7 @@ class Item(models.Model):
     finished = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True,blank=True)
     objects = ItemManager()
 
     def __str__(self):

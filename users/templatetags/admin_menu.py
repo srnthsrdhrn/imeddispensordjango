@@ -37,6 +37,10 @@ def show_admin_menu(user):
                         "url": reverse("check_patient"),
                         # "permission": 'kctusers.add_user'
                     },
+                    {
+                        "name": "Pharmacist Prescription Upload",
+                        "url": reverse("pharmacist_prescription_upload")
+                    }
 
                 ]
         },
@@ -61,13 +65,13 @@ def show_admin_menu(user):
                         "name": "Create Device",
                         "url": reverse("insert_device"),
                         # "permission": 'kctusers.add_user'
- 
+
                     },
-                                        {
+                    {
                         "name": "Device list",
                         "url": reverse("devices_list"),
                         # "permission": 'kctusers.add_user'
- 
+
                     },
 
                 ]

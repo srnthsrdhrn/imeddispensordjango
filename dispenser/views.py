@@ -54,7 +54,7 @@ class DeviceDetails(APIView):
         return Response(DeviceSerializer(device).data)
 
 
-def Dev(request):
+def device_list(request):
     dis = Device.objects.all()
     context = {"dis": dis, }
     return render(request, 'dispenser/dispenser.html', context)
@@ -99,37 +99,38 @@ class DispenseLogAPI(APIView):
                     load = load_data.load
                     load.dispensed = True
                     load.save()
-                prescription = Prescription.objects.get(id=prescription)
-                compositions = prescription.items.values('composition').distinct()
-                dispense_flag = True
-                for composition in compositions:
-                    composition = composition['composition']
-                    composition = Composition.objects.get(id=composition)
-                    cmps = prescription.items.filter(composition=composition)
-                    required_qty = 0
-                    for cmp in cmps:
-                        required_qty += cmp.quantity * cmp.no_of_days
-                    dispensed_qty = 0
-                    dosages = prescription.dispenses.filter(medicine__composition__name=composition.name).values(
-                        'medicine__composition__dosage').distinct()
-                    for dosage in dosages:
-                        dosage = dosage['medicine__composition__dosage']
-                        temp_dosage = dosage / float(composition.dosage)
-                        temp_qty = \
-                            prescription.dispenses.filter(medicine__composition__dosage=dosage,
-                                                          medicine__composition__name=composition.name).distinct().aggregate(
-                                Sum("quantity"))['quantity__sum'] * temp_dosage
-                        dispensed_qty += temp_qty
-                    # dispenses = prescription.dispenses.filter(medicine__composition__name=composition.name).aggregate(
-                    #     Sum('quantity'))
-                    # if dispenses['quantity__sum']:
-                    #     dispensed_qty = dispenses['quantity__sum']
-                    dispensed_qty = int(dispensed_qty)
-                    if required_qty != dispensed_qty:
-                        dispense_flag = False
-                if dispense_flag:
-                    prescription.dispensed = True
-                    prescription.save()
+                if prescription:
+                    prescription = Prescription.objects.get(id=prescription)
+                    compositions = prescription.items.values('composition').distinct()
+                    dispense_flag = True
+                    for composition in compositions:
+                        composition = composition['composition']
+                        composition = Composition.objects.get(id=composition)
+                        cmps = prescription.items.filter(composition=composition)
+                        required_qty = 0
+                        for cmp in cmps:
+                            required_qty += cmp.quantity * cmp.no_of_days
+                        dispensed_qty = 0
+                        dosages = prescription.dispenses.filter(medicine__composition__name=composition.name).values(
+                            'medicine__composition__dosage').distinct()
+                        for dosage in dosages:
+                            dosage = dosage['medicine__composition__dosage']
+                            temp_dosage = dosage / float(composition.dosage)
+                            temp_qty = \
+                                prescription.dispenses.filter(medicine__composition__dosage=dosage,
+                                                              medicine__composition__name=composition.name).distinct().aggregate(
+                                    Sum("quantity"))['quantity__sum'] * temp_dosage
+                            dispensed_qty += temp_qty
+                        # dispenses = prescription.dispenses.filter(medicine__composition__name=composition.name).aggregate(
+                        #     Sum('quantity'))
+                        # if dispenses['quantity__sum']:
+                        #     dispensed_qty = dispenses['quantity__sum']
+                        dispensed_qty = int(dispensed_qty)
+                        if required_qty != dispensed_qty:
+                            dispense_flag = False
+                    if dispense_flag:
+                        prescription.dispensed = True
+                        prescription.save()
             return Response({'status': "Success"})
         except Exception, e:
             return Response({'Error': e.message}, status=400)

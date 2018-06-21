@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-# Create your views here.
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dispenser.models import Chamber, DispenseLog
-from doctor.forms import DiagnosisForm
+from doctor.forms import DiagnosisForm, PharmacistDiagnosisForm
 from doctor.models import Prescription
 from users.models import User
+
+
+# Create your views here.
 
 
 @login_required
@@ -63,3 +61,14 @@ def prescription_view(request, prescription_id):
     prescription = Prescription.objects.get(id=prescription_id)
     return render(request, 'doctor/prescription_view.html', {'prescription': prescription})
 
+
+def pharmacist_prescription_upload(request):
+    form = PharmacistDiagnosisForm()
+    return render(request, 'doctor/new_pharmacist_prescription.html', {'form': form})
+
+
+def complete_pharmacist_prescription(request):
+    if request.method == 'POST':
+        data = request.POST
+        files = request.FILES
+        pass

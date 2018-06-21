@@ -41,7 +41,7 @@ class Chamber(models.Model):
 
 class DispenseLog(models.Model):
     chamber = models.ForeignKey('Chamber', related_name='dispenses')
-    prescription = models.ForeignKey('doctor.Prescription', related_name='dispenses')
+    prescription = models.ForeignKey('doctor.Prescription', related_name='dispenses', null=True, blank=True)
     medicine = models.ForeignKey(Medicine, related_name='dispenses')
     quantity = models.IntegerField(default=0)
     finished = models.BooleanField(default=False)

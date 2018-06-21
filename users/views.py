@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from users.models import User
+from instamojo import create_payment_request
+from users.models import User, Transaction
 from users.serializers import PrescriptionSerializer, UserSerializer
 
 
@@ -94,3 +95,102 @@ class ScheduleAPI(APIView):
                 pass
             else:
                 return Response({"status": "Wrong Credentials"}, status=400)
+
+
+class InstaMojoWebhook(APIView):
+    def post(self, request):
+        data = request.POST
+        request_id = data.get("payment_request_id")
+        transaction = Transaction.objects.get(payment_request_id=request_id)
+        transaction.payment_id = data.get("payment_id")
+        transaction.short_url = data.get("short_urk")
+        transaction.currency = data.get("currency")
+        transaction.paid = True
+        transaction.fees = data.get("fees")
+        transaction.email = data.get("buyer")
+        transaction.buyer_name = data.get("buyer_name")
+        transaction.save()
+        return Response({"Success"})
+        # mac_provided = data.get("mac")
+        # message = "|".join(v for k, v in sorted(data.items(), key=lambda x: x[0].lower()) if k != 'mac')
+        # mac_calculated = hmac.new(INSTA_MOJO_SALT_TEST, message, hashlib.sha1).hexdigest()
+        # if mac_provided == mac_calculated:
+        #     if data['status'] == "Credit":
+        #         print("Success")
+        #         # Payment was successful, mark it as completed in your database.
+        #         pass
+        #     else:
+        #         print("Error")
+        #         pass
+        #     # Payment was unsuccessful, mark it as failed in your database.
+        #     return Response({"status": "Success"})
+        # else:
+        #     return Response({"status": "Error"}, status=400)
+
+
+class InitiatePayment(APIView):
+    def post(self, request):
+        data = request.POST
+        user_id = data.get("user_id")
+        aadhar = data.get("aadhar")
+        amount = data.get("amount")
+        mobile_number = data.get("mobile_number")
+        if aadhar and user_id:
+            user = User.objects.get(id=user_id)
+            if user.aadhar_number == int(aadhar):
+                response = create_payment_request("Medicine Purchase", amount=str(amount), buyer_name=user.first_name,
+                                                  email=user.email,
+                                                  phone=str(user.mobile_number))
+                if response:
+                    transaction = Transaction()
+                    transaction.email = response.get("email")
+                    transaction.payment_request_id = response.get("id")
+                    transaction.buyer_phone = response.get("phone")
+                    transaction.amount = response.get("amount")
+                    transaction.sms_status = response.get("sms_status")
+                    transaction.email_status = response.get("email_status")
+                    transaction.long_url = response.get("longurl")
+                    transaction.purpose = response.get("purpose")
+                    transaction.save()
+                    return Response({"id": transaction.payment_request_id})
+                else:
+                    return Response({"error": "Error Processing Request"})
+            else:
+                return Response({"error": "Wrong Credentials"}, status=400)
+        elif mobile_number and not aadhar:
+            response = create_payment_request(purpose="Medicine Purchase", amount=str(amount), phone=mobile_number)
+            if response:
+                transaction = Transaction()
+                transaction.payment_request_id = response.get("id")
+                transaction.buyer_phone = response.get("phone")
+                transaction.amount = response.get("amount")
+                transaction.sms_status = response.get("sms_status")
+                transaction.email_status = response.get("email_status")
+                transaction.long_url = response.get("longurl")
+                transaction.purpose = response.get("purpose")
+                transaction.save()
+                return Response({"id": transaction.payment_request_id})
+            else:
+                return Response({"error": "Error Processing Request"},status=400)
+        else:
+            return Response({"error": "Bad Request"}, status=400)
+
+
+class PaymentVerification(APIView):
+    def get(self, request):
+        data = request.GET
+        payment_request_id = data.get("payment_request_id")
+        try:
+            transaction = Transaction.objects.get(payment_request_id=payment_request_id)
+        except Transaction.DoesNotExist, e:
+            return Response({"error": "Invalid Payment Request ID"})
+        # return Response({"status": transaction.paid})
+        return Response({"status": True})
+
+
+class PaymentOverride(APIView):
+    def get(self, request):
+        for t in Transaction.objects.all():
+            t.paid = True
+            t.save()
+        return Response({"Successfully Overridden"})
