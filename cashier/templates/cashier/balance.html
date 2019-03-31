@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <section class="content-header">
-        <h1>Check Balnce - user</h1>
+        <h1>Check Balance - user</h1>
     </section>
     <section class="content">
 
@@ -19,7 +19,7 @@
                 {% if user %}
                     Name : {{ user.first_name }} {{ user.last_number }}<br>
                     Aadhar Number : {{ user.aadhar_number }} <br>
-                    Balance : Rs. {{ user.get_wallet_balance }}
+                    Balance : Rs. {{ balance }}
                 {% endif %}
             </div>
 

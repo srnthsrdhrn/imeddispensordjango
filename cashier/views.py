@@ -26,10 +26,11 @@ def recharge(request):
 def view_balance(request):
     form = BalanceForm()
     user = None
+    balance = 0
     if request.POST:
         form = BalanceForm(request.POST)
         if form.is_valid():
             form = BalanceForm(request.POST)
-            user = form.save()
+            user, balance = form.save()
 
-    return render(request, 'cashier/balance.html', {"form": form, 'user': user})
+    return render(request, 'cashier/balance.html', {"form": form, 'user': user, 'balance': balance})

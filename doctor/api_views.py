@@ -184,7 +184,7 @@ class PrescriptionAPI(APIView):
                         rem = 0
                         break
                     else:
-                        rem -= denominations['key']
+                        rem -= denominations[key]
                 if rem > 5:
                     is_available = False
                 if selected_available_qty >= quota:
@@ -328,7 +328,7 @@ class PrescriptionDetailAPI(APIView):
             composition = composition['composition']
             composition = Composition.objects.get(id=composition)
             items = prescription.items.filter(composition=composition)
-            data = {'medicine': composition.medicines.all()[0].__str__(), 'B': 0, 'L': 0, 'D': 0, 'Aft': 0, 'Bfr': 0}
+            data = {'medicine': composition.medicines.all()[1].__str__(), 'B': 0, 'L': 0, 'D': 0, 'Aft': 0, 'Bfr': 0}
             for item in items:
                 if item.slot == item.BEFORE_BREAKFAST:
                     data['B'] = item.quantity

@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get("SECRET_KEY", "4yljy#v)c))5wxdkuw@2bk_lk%hf9*$8g!zkx)r+myp!+e3b9k")
 IS_PRODUCTION = os.environ.get("IS_PRODUCTION", False)
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = not IS_PRODUCTION
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 # Application definition
@@ -168,4 +168,6 @@ INSTA_MOJO_SALT_TEST = 'f8b93c9043964862847387d044e4e79d'
 INSTA_MOJO_API_KEY_TEST = 'test_d0df5b44a987c41dbc7aa75e560'
 INSTA_MOJO_AUTH_TOKEN_TEST = 'test_6beb5ae2edb00396e835f8379b4'
 
-SERVER_URL = 'http://192.168.43.192:8000'
+
+# SERVER_URL = 'http://192.168.43.192:8000'
+SERVER_URL = 'https://imed.iqube.io'

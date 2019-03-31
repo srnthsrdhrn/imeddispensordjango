@@ -1,3 +1,4 @@
+import requests
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
@@ -82,4 +83,18 @@ class BalanceForm(forms.Form):
     def save(self):
         data = self.data
         user = User.objects.get(aadhar_number=data.get("aadhar_number"))
-        return user
+        url = "https://imedkash.iqube.io/api/get_user_info/"
+
+        payload = "rfid={}&undefined=".format(user.aadhar_number)
+        headers = {
+            'Content-Type': "application/x-www-form-urlencoded",
+            'Authorization': "Basic YWRtaW46c3JudGhzcmRocm4=",
+            'cache-control': "no-cache",
+        }
+
+        response = requests.request("POST", url, data=payload, headers=headers)
+        balance = 0
+        response = response.json()
+        if response.get("Status") == "SUCCESS":
+            balance = response.get("UserInfo")[0].get("balance")
+        return user, balance
