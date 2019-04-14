@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.dateparse import parse_datetime
 # Create your views here.
 from rest_framework.response import Response
@@ -74,7 +74,7 @@ def post_new(request):
         if form.is_valid():
             post = form.save()
             post.save()
-            return HttpResponseRedirect('/dispenser/')
+            return redirect("doctor_dashboard")
     else:
         form = PostForm()
     return render(request, 'dispenser/device_form.html', {'form': form})

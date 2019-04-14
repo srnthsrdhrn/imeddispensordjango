@@ -16,10 +16,10 @@ def landing_page(request):
 
 
 def login_success(request):
-    if request.user.account_type == User.DOCTOR:
+    if request.user.account_type == User.DOCTOR or request.user.account_type == User.VENDOR:
         return redirect('doctor_dashboard')
-    elif request.user.account_type == User.PATIENT:
-        return redirect('patient_dashboard')
+    # elif request.user.account_type == User.PATIENT:
+    #     return redirect('patient_dashboard')
     return render(request, 'admin_theme/dashboard.html')
 
 
