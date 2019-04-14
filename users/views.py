@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import requests
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
@@ -145,44 +146,48 @@ class InitiatePayment(APIView):
         aadhar = data.get("aadhar")
         amount = data.get("amount")
         mobile_number = data.get("mobile_number")
-        if aadhar and user_id:
-            user = User.objects.get(id=user_id)
-            if user.aadhar_number == int(aadhar):
-                response = create_payment_request("Medicine Purchase", amount=str(amount), buyer_name=user.first_name,
-                                                  email=user.email,
-                                                  phone=str(user.mobile_number))
-                if response:
-                    transaction = Transaction()
-                    transaction.email = response.get("email")
-                    transaction.payment_request_id = response.get("id")
-                    transaction.buyer_phone = response.get("phone")
-                    transaction.sender = user
-                    transaction.amount = response.get("amount")
-                    transaction.sms_status = response.get("sms_status")
-                    transaction.email_status = response.get("email_status")
-                    transaction.long_url = response.get("longurl")
-                    transaction.purpose = response.get("purpose")
-                    transaction.save()
-                    return Response({"id": transaction.payment_request_id})
-                else:
-                    return Response({"error": "Error Processing Request"})
-            else:
-                return Response({"error": "Wrong Credentials"}, status=400)
-        elif mobile_number and not aadhar:
-            response = create_payment_request(purpose="Medicine Purchase", amount=str(amount), phone=mobile_number)
-            if response:
-                transaction = Transaction()
-                transaction.payment_request_id = response.get("id")
-                transaction.buyer_phone = response.get("phone")
-                transaction.amount = response.get("amount")
-                transaction.sms_status = response.get("sms_status")
-                transaction.email_status = response.get("email_status")
-                transaction.long_url = response.get("longurl")
-                transaction.purpose = response.get("purpose")
-                transaction.save()
-                return Response({"id": transaction.payment_request_id})
-            else:
-                return Response({"error": "Error Processing Request"}, status=400)
+        # if aadhar and user_id:
+        #     user = User.objects.get(id=user_id)
+        #     if user.aadhar_number == int(aadhar):
+        #         response = create_payment_request("Medicine Purchase", amount=str(amount), buyer_name=user.first_name,
+        #                                           email=user.email,
+        #                                           phone=str(user.mobile_number))
+        #         if response:
+        #             transaction = Transaction()
+        #             transaction.email = response.get("email")
+        #             transaction.payment_request_id = response.get("id")
+        #             transaction.buyer_phone = response.get("phone")
+        #             transaction.sender = user
+        #             transaction.amount = response.get("amount")
+        #             transaction.sms_status = response.get("sms_status")
+        #             transaction.email_status = response.get("email_status")
+        #             transaction.long_url = response.get("longurl")
+        #             transaction.purpose = response.get("purpose")
+        #             transaction.save()
+        #             return Response({"id": transaction.payment_request_id})
+        #         else:
+        #             return Response({"error": "Error Processing Request"})
+        #     else:
+        #         return Response({"error": "Wrong Credentials"}, status=400)
+        # elif mobile_number and not aadhar:
+        #     response = create_payment_request(purpose="Medicine Purchase", amount=str(amount), phone=mobile_number)
+        #     if response:
+        #         transaction = Transaction()
+        #         transaction.payment_request_id = response.get("id")
+        #         transaction.buyer_phone = response.get("phone")
+        #         transaction.amount = response.get("amount")
+        #         transaction.sms_status = response.get("sms_status")
+        #         transaction.email_status = response.get("email_status")
+        #         transaction.long_url = response.get("longurl")
+        #         transaction.purpose = response.get("purpose")
+        #         transaction.save()
+        #         return Response({"id": transaction.payment_request_id})
+        #     else:
+        #         return Response({"error": "Error Processing Request"}, status=400)
+        if user_id and aadhar:
+            requests.post('https://imedkash.iqube.io/api/external_payment_gateway',
+                          data={"user_id": user_id, "aadhar": aadhar, "qty": 3})
+            return Response({"id": 1, "status": "Success"})
         else:
             return Response({"error": "Bad Request"}, status=400)
 
