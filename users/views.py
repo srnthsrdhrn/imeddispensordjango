@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,7 +18,16 @@ def landing_page(request):
 def login_success(request):
     if request.user.account_type == User.DOCTOR:
         return redirect('doctor_dashboard')
+    elif request.user.account_type == User.PATIENT:
+        return redirect('patient_dashboard')
     return render(request, 'admin_theme/dashboard.html')
+
+
+@login_required
+def patient_dashboard(request):
+    user = request.user
+    transactions = Transaction.objects.filter(sender=user)
+    return render(request, 'patient/patient_dashboard.html', {'transactions': transactions})
 
 
 class LoginAPI(APIView):
@@ -103,7 +113,7 @@ class InstaMojoWebhook(APIView):
         request_id = data.get("payment_request_id")
         transaction = Transaction.objects.get(payment_request_id=request_id)
         transaction.payment_id = data.get("payment_id")
-        transaction.short_url = data.get("short_urk")
+        transaction.short_url = data.get("short_url")
         transaction.currency = data.get("currency")
         transaction.paid = True
         transaction.fees = data.get("fees")
@@ -146,6 +156,7 @@ class InitiatePayment(APIView):
                     transaction.email = response.get("email")
                     transaction.payment_request_id = response.get("id")
                     transaction.buyer_phone = response.get("phone")
+                    transaction.sender = user
                     transaction.amount = response.get("amount")
                     transaction.sms_status = response.get("sms_status")
                     transaction.email_status = response.get("email_status")
@@ -171,7 +182,7 @@ class InitiatePayment(APIView):
                 transaction.save()
                 return Response({"id": transaction.payment_request_id})
             else:
-                return Response({"error": "Error Processing Request"},status=400)
+                return Response({"error": "Error Processing Request"}, status=400)
         else:
             return Response({"error": "Bad Request"}, status=400)
 
@@ -184,8 +195,8 @@ class PaymentVerification(APIView):
             transaction = Transaction.objects.get(payment_request_id=payment_request_id)
         except Transaction.DoesNotExist, e:
             return Response({"error": "Invalid Payment Request ID"})
-        # return Response({"status": transaction.paid})
-        return Response({"status": True})
+        return Response({"status": transaction.paid})
+        # return Response({"status": True})
 
 
 class PaymentOverride(APIView):

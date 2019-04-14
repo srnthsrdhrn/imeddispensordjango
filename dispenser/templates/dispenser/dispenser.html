@@ -1,46 +1,37 @@
 {% extends 'admin_theme/dashboard.html' %}
 {% block content %}
-    <script type="text/javascript">
-        var locations = ([]);
-        {% for i in dis%}
-            locations.push(["{{i.id}}", {{i.lat}}, {{i.lng}}, "{{i.location}}"]);
-        {% endfor %}
-        function initMap() {
-            var myOptions = {
-                center: new google.maps.LatLng(20.5937, 78.9629),
-                zoom: 7,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var map = new google.maps.Map(document.getElementById("default"),
-                myOptions);
-            setMarkers(map, locations)
-        };
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h4>Device List</h4>
+        </div>
+        <div class="panel-body">
+            <table border="2" class="table table-responsive">
+                <tr>
 
-        function setMarkers(map, locations) {
-            var marker, i;
-            for (i = 0; i < locations.length; i++) {
-                var id = locations[i][0];
-                var lat = locations[i][1];
-                var long = locations[i][2];
-                var location = locations[i][3];
-                latlngset = new google.maps.LatLng(lat, long);
-                marker = new google.maps.Marker({
-                    map: map, title: id, position: latlngset
-                });
-                map.setCenter(marker.getPosition());
-                var content = "id:" + id + ' ' + "location: " + location;
-                var infowindow = new google.maps.InfoWindow();
-                google.maps.event.addListener(marker, 'click', (function (marker, content, infowindow) {
-                    return function () {
-                        infowindow.setContent(content);
-                        infowindow.open(map, marker);
-                    };
-                })(marker, content, infowindow));
-            }
-        }
-    </script>
-    <div id="default" style="width:60%; height:60%;"></div>
-    <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzqDwNULfEqXYRohhaQlWtrToPg_iI1BU&libraries=places,drawing&callback=initMap">
-    </script>
+                    <th>Sno</th>
+                    <th>Device id</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+
+
+                </tr>
+                {% for device in devices %}
+                    <tr>
+                        <td>
+                            <center>{{ forloop.counter }}</center>
+                        </td>
+                        <td>{{ device.id }}</td>
+                        <td>{{ device.lat }}</td>
+                        <td>{{ device.lng }}</td>
+                        <td>{{ device.location }}</td>
+                        <td><a href="{% url 'device_load' device.id %}" class="btn btn-primary">Load</a></td>
+                    </tr>
+                {% empty %}
+                    <h3> No Devices!</h3>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 {% endblock %}

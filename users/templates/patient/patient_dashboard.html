@@ -1,0 +1,27 @@
+{% extends 'admin_theme/dashboard.html' %}
+{% block content %}
+    <div class="container container-fluid">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>User Dashboard</h3>
+        </div>
+        <div class="panel-body">
+            <h2>Wallet Balance: {{ request.user.get_wallet_balance }}</h2>
+            <div class="table table-bordered table-striped">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Sl.no</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+                {% for transaction in transactions %}
+
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+    </div>
+{% endblock %}

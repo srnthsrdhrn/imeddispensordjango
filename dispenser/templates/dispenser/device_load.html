@@ -1,0 +1,29 @@
+{% extends 'admin_theme/dashboard.html' %}
+{% block content %}
+    {% load crispy_forms_tags %}
+    <h3 align="center">Load Device</h3>
+    <div style="width:400px; margin: auto;">
+        <form method="POST" class="post-form">
+            {% csrf_token %}
+
+            {% for error in form.non_field_errors %}
+                <div class="form-group has-errors text-danger small">
+                    {{ error }}
+                </div>
+            {% endfor %}
+
+            {% for chamber in chambers %}
+                <div class="form-group">
+                    <label for="chamber-{{ chamber }}">Chamber: {{ chamber }}</label>
+                    <select id="chamber-{{ chamber }}" name="chamber-{{ chamber }}">
+                        {% for medicine in medicines %}
+                            <option name="{{ medicine }}">{{ medicine }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endfor %}
+            <button class="btn btn-primary" style="width: 150px; margin:0 auto;">Submit</button>
+        </form>
+    </div>
+    </div>
+{% endblock %}

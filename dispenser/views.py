@@ -47,6 +47,13 @@ class VendorLoadAPI(APIView):
         return Response({'status': 'Error Bad Request'}, status=400)
 
 
+def vendor_load_device(request, device_id):
+    device = Device.objects.get(id=device_id)
+    chambers = device.chambers.all()
+    medicines = Medicine.objects.all()
+    return render(request, 'dispenser/device_load.html', {'chambers': chambers, 'medicines': medicines})
+
+
 class DeviceDetails(APIView):
     def get(self, request):
         device_id = request.GET.get("device_id")
@@ -55,8 +62,8 @@ class DeviceDetails(APIView):
 
 
 def device_list(request):
-    dis = Device.objects.all()
-    context = {"dis": dis, }
+    devices = Device.objects.filter(vendor=request.user)
+    context = {"devices": devices}
     return render(request, 'dispenser/dispenser.html', context)
 
 
